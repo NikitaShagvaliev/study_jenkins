@@ -1,9 +1,9 @@
 pipeline {
     agent any
     stages {
-        stage('Hello') {
+        stage('Disk Info') {
             steps {
-                echo 'Hello, World!'
+                sh 'df -h'
             }
         }
     }
