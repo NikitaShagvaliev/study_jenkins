@@ -8,8 +8,9 @@ pipeline {
                 sh 'echo "Inode Usage Information:"'
                 sh 'df -i'
                 sh 'echo "Mounted Filesystems:"'
-                sh 'mount | column -t'
+                sh 'mount'
             }
         }
     }
 }
+
