@@ -1,40 +1,27 @@
-import java.io.File
-import groovy.json.JsonOutput
-
-def getDriveInfo() {
-    def drivesInfo = []
-    File.listRoots().each { file ->
-        def totalSpace = file.getTotalSpace()
-        def freeSpace = file.getFreeSpace()
-        def usedSpace = totalSpace - freeSpace
-        
-        def driveInfo = [
-            path      : file.path,
-            totalSpace: formatSize(totalSpace),
-            usedSpace : formatSize(usedSpace),
-            freeSpace : formatSize(freeSpace)
-        ]
-        
-        drivesInfo << driveInfo
+groovypipeline {
+    agent any
+    stages {
+        stage('Log Drive Info') {
+            steps {
+                script {
+                    @NonCPS
+                    def logDriveInfo() {
+                        def roots = File.listRoots()
+                        roots.each { root ->
+                            def totalSpace = root.getTotalSpace() / 1024 / 1024 / 1024 // GB
+                            def freeSpace = root.getFreeSpace() / 1024 / 1024 / 1024 // GB
+                            def usedSpace = totalSpace - freeSpace
+                            
+                            println "Drive: ${root.getAbsolutePath()}"
+                            println "Total Space: ${totalSpace} GB"
+                            println "Free Space: ${freeSpace} GB"
+                            println "Used Space: ${usedSpace} GB"
+                            println "----------------------------------"
+                        }
+                    }
+                    logDriveInfo()
+                }
+            }
+        }
     }
-    return drivesInfo
 }
-
-def formatSize(size) {
-    def unit = 1024
-    if (size < unit) return "${size} B"
-    int exp = (int) (Math.log(size) / Math.log(unit))
-    String pre = "KMGTPE".charAt(exp - 1).toString()
-    return String.format("%.1f %sB", size / Math.pow(unit, exp), pre)
-}
-
-def logDriveInfo() {
-    def logger = new File('drive_info.log')
-    def drivesInfo = getDriveInfo()
-    
-    logger.text = JsonOutput.prettyPrint(JsonOutput.toJson(drivesInfo))
-    println JsonOutput.prettyPrint(JsonOutput.toJson(drivesInfo))
-}
-
-// Execute the logging function
-logDriveInfo()
