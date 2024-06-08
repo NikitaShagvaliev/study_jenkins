@@ -1,4 +1,5 @@
-groovypipeline {
+groovy
+pipeline {
     agent any
     stages {
         stage('Log Drive Info') {
